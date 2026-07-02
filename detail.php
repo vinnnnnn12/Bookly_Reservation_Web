@@ -24,10 +24,22 @@ if (numRows($result) == 0) {
 
 $room = fetchOne($result);
 
-// Cek gambar
-$gambarPath = 'uploads/' . $room['gambar'];
-if (!file_exists($gambarPath)) {
-    $gambarPath = 'uploads/default.jpg';
+// =============================================
+// CEK GAMBAR - Support URL dan File Lokal
+// =============================================
+$gambarPath = $room['gambar'];
+
+// Cek apakah ini URL (mulai dengan http atau https)
+if (filter_var($gambarPath, FILTER_VALIDATE_URL)) {
+    // Ini adalah URL, langsung pakai
+    $gambarUrl = $gambarPath;
+} else {
+    // Ini adalah file lokal, cek keberadaan file
+    $gambarPath = 'uploads/' . $room['gambar'];
+    if (!file_exists($gambarPath)) {
+        $gambarPath = 'uploads/default.jpg';
+    }
+    $gambarUrl = $gambarPath;
 }
 
 // Ambil jadwal reservasi yang aktif
@@ -59,7 +71,7 @@ $isBooked = numRows($jadwalResult) > 0;
     </div>
     
     <div class="detail-image" style="background: none; height: 400px; overflow: hidden;">
-        <img src="<?= $gambarPath ?>" alt="<?= htmlspecialchars($room['nama']) ?>" 
+        <img src="<?= $gambarUrl ?>" alt="<?= htmlspecialchars($room['nama']) ?>" 
              style="width: 100%; height: 100%; object-fit: cover; display: block;">
     </div>
     
