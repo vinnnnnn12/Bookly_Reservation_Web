@@ -1,0 +1,13 @@
+{
+  "version": 2,
+  "builds": [
+    { "src": "*.php", "use": "vercel-php@0.7.3" }
+  ],
+  "routes": [
+    { "src": "/uploads/(.*)", "dest": "/uploads/$1" },
+    { "src": "/style.css", "dest": "/style.css" },
+    { "src": "/script.js", "dest": "/script.js" },
+    { "src": "/", "dest": "/index.php" },
+    { "src": "/(.*)", "dest": "/$1" }
+  ]
+}
