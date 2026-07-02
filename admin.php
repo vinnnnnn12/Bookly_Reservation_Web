@@ -372,9 +372,23 @@ $show_add_form = isset($_GET['show_add']) ? true : false;
                     </div>
                     <div class="form-group" style="grid-column: 1 / -1;">
                         <label>Gambar Ruangan</label>
-                        <?php if($edit_room['gambar'] != 'default.jpg' && file_exists('uploads/' . $edit_room['gambar'])): ?>
+                        <?php 
+                        $gambarPath = $edit_room['gambar'];
+                        $showPreview = false;
+
+                        if (filter_var($gambarPath, FILTER_VALIDATE_URL)) {
+                            $showPreview = true;
+                            $previewSrc = $gambarPath;
+                        } else {
+                            if ($gambarPath != 'default.jpg' && file_exists('uploads/' . $gambarPath)) {
+                                $showPreview = true;
+                                $previewSrc = 'uploads/' . $gambarPath;
+                            }
+                        }
+                        ?>
+                        <?php if($showPreview): ?>
                             <div style="margin-bottom: 10px;">
-                                <img src="uploads/<?= $edit_room['gambar'] ?>" alt="Gambar Ruangan" style="max-width: 200px; max-height: 150px; border-radius: 8px; border: 1px solid #ddd;">
+                                <img src="<?= $previewSrc ?>" alt="Gambar Ruangan" style="max-width: 200px; max-height: 150px; border-radius: 8px; border: 1px solid #ddd;">
                             </div>
                         <?php endif; ?>
                         <input type="file" name="gambar" accept="image/*">
@@ -408,8 +422,22 @@ $show_add_form = isset($_GET['show_add']) ? true : false;
                     <tr>
                         <td><?= $no++ ?></td>
                         <td>
-                            <?php if($room['gambar'] != 'default.jpg' && file_exists('uploads/' . $room['gambar'])): ?>
-                                <img src="uploads/<?= $room['gambar'] ?>" alt="<?= htmlspecialchars($room['nama']) ?>" style="width: 50px; height: 50px; object-fit: cover; border-radius: 5px;">
+                            <?php 
+                            $gambarPath = $room['gambar'];
+                            $showImage = false;
+                            
+                            if (filter_var($gambarPath, FILTER_VALIDATE_URL)) {
+                                $showImage = true;
+                                $imageSrc = $gambarPath;
+                            } else {
+                                if ($gambarPath != 'default.jpg' && file_exists('uploads/' . $gambarPath)) {
+                                    $showImage = true;
+                                    $imageSrc = 'uploads/' . $gambarPath;
+                                }
+                            }
+                            ?>
+                            <?php if($showImage): ?>
+                                <img src="<?= $imageSrc ?>" alt="<?= htmlspecialchars($room['nama']) ?>" style="width: 50px; height: 50px; object-fit: cover; border-radius: 5px;">
                             <?php else: ?>
                                 <span style="color: #999; font-size: 0.8rem;">No Image</span>
                             <?php endif; ?>

@@ -69,7 +69,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             
             <div class="form-group">
                 <button type="submit" class="btn btn-success" style="width: 100%; font-weight: bold; text-transform: uppercase; font-size: 1.1rem; letter-spacing: 1px;">
-                    Login sebagai Client
+                    Login
                 </button>
             </div>
         </form>
