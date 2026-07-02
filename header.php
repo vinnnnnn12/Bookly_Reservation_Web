@@ -30,9 +30,12 @@ require_once __DIR__ . '/session_init.php';
                             <li><a href="dashboard.php">Dashboard Saya</a></li>
                         <?php endif; ?>
                         <li>
-                            <span style="color: white; margin-right: 10px;">
-                                <?= $_SESSION['role'] == 'admin' ? '[Admin]' : '[Client]' ?>
-                                <?= $_SESSION['nama'] ?>
+                            <span style="color: white; font-weight: bold; margin-right: 10px;">
+                                <?php if($_SESSION['role'] == 'admin'): ?>
+                                    ADMIN
+                                <?php else: ?>
+                                    <?= $_SESSION['nama'] ?>
+                                <?php endif; ?>
                             </span>
                         </li>
                         <li><a href="logout.php" class="btn-logout">Logout</a></li>
