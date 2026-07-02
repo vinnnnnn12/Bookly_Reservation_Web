@@ -72,15 +72,27 @@ while($res = fetchOne($reservasiResult)) {
             $reservasiList = isset($reservasiGroup[$roomId]) ? $reservasiGroup[$roomId] : [];
             $isBooked = !empty($reservasiList);
             
-            // Cek gambar
-            $gambarPath = 'uploads/' . $room['gambar'];
-            if (!file_exists($gambarPath)) {
-                $gambarPath = 'uploads/default.jpg';
+            // =============================================
+            // CEK GAMBAR - Support URL dan File Lokal
+            // =============================================
+            $gambarPath = $room['gambar'];
+            
+            // Cek apakah ini URL (mulai dengan http atau https)
+            if (filter_var($gambarPath, FILTER_VALIDATE_URL)) {
+                // Ini adalah URL, langsung pakai
+                $gambarUrl = $gambarPath;
+            } else {
+                // Ini adalah file lokal, cek keberadaan file
+                $gambarPath = 'uploads/' . $room['gambar'];
+                if (!file_exists($gambarPath)) {
+                    $gambarPath = 'uploads/default.jpg';
+                }
+                $gambarUrl = $gambarPath;
             }
         ?>
         <div class="card" data-lantai="<?= $room['lantai'] ?>">
             <div class="card-image" style="background: none; height: 200px; overflow: hidden; position: relative;">
-                <img src="<?= $gambarPath ?>" alt="<?= htmlspecialchars($room['nama']) ?>" 
+                <img src="<?= $gambarUrl ?>" alt="<?= htmlspecialchars($room['nama']) ?>" 
                      style="width: 100%; height: 100%; object-fit: cover; display: block;">
                 <div style="position: absolute; top: 10px; left: 10px; background: rgba(0,0,0,0.7); color: white; padding: 4px 12px; border-radius: 15px; font-size: 0.7rem; font-weight: bold;">
                     Lantai <?= $room['lantai'] ?>
