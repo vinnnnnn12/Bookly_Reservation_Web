@@ -4,6 +4,12 @@ ini_set('display_errors', 1);
 
 require_once __DIR__ . '/session_init.php';
 
+// Wajib login dulu sebelum bisa lihat daftar ruangan
+if (!isset($_SESSION['user_id'])) {
+    header('Location: login.php');
+    exit();
+}
+
 if (!testConnection()) {
     die('<h1>Error Database</h1><p>Koneksi ke database gagal. Pastikan MySQL berjalan di XAMPP.</p>');
 }
