@@ -19,10 +19,6 @@ if (isset($_POST['add_room'])) {
     $fasilitas = escape($_POST['fasilitas']);
     $deskripsi = escape($_POST['deskripsi']);
     
-    // Proses upload gambar
-    // CATATAN: Di Vercel, filesystem project bersifat read-only. Upload gambar
-    // baru tidak akan tersimpan permanen. Kalau upload gagal, tetap lanjutkan
-    // simpan data ruangan dengan gambar default supaya fitur lain tidak rusak.
     $gambar = 'default.jpg';
     $uploadWarning = '';
     if (isset($_FILES['gambar']) && $_FILES['gambar']['error'] == 0) {
@@ -69,8 +65,6 @@ if (isset($_POST['edit_room'])) {
     $dataGambar = fetchOne($resultGambar);
     $gambar = $dataGambar['gambar'];
     
-    // CATATAN: sama seperti tambah ruangan, upload gambar baru tidak permanen
-    // di Vercel (filesystem read-only). Kalau gagal, gambar lama tetap dipakai.
     if (isset($_FILES['gambar']) && $_FILES['gambar']['error'] == 0) {
         $target_dir = "uploads/";
         $check = @getimagesize($_FILES['gambar']['tmp_name']);
@@ -122,6 +116,27 @@ if (isset($_GET['delete_room']) && isset($_GET['id'])) {
         $success = 'Ruangan berhasil dihapus!';
     } else {
         $error = 'Gagal menghapus ruangan: ' . mysqli_error($conn);
+    }
+}
+
+// =============================================
+// ADMIN - HAPUS CLIENT
+// =============================================
+if (isset($_GET['delete_client']) && isset($_GET['id'])) {
+    $id = intval($_GET['id']);
+    
+    // Cek apakah client ini punya reservasi
+    $cekReservasi = "SELECT id FROM reservations WHERE user_id = $id";
+    $reservasiResult = query($cekReservasi);
+    if (numRows($reservasiResult) > 0) {
+        $error = 'Client ini memiliki reservasi aktif! Hapus reservasi terlebih dahulu.';
+    } else {
+        $delete = "DELETE FROM users WHERE id = $id AND role = 'client'";
+        if (query($delete)) {
+            $success = 'Client berhasil dihapus!';
+        } else {
+            $error = 'Gagal menghapus client: ' . mysqli_error($conn);
+        }
     }
 }
 
@@ -204,6 +219,10 @@ $reservationsQuery = "SELECT r.*, rm.nama as ruangan, rm.lantai, rm.id as room_i
                       JOIN users u ON r.user_id = u.id 
                       ORDER BY r.tanggal DESC, r.jam_mulai DESC";
 $reservations = query($reservationsQuery);
+
+// Ambil semua client
+$clientsQuery = "SELECT id, nama, email, created_at FROM users WHERE role = 'client' ORDER BY created_at DESC";
+$clients = query($clientsQuery);
 
 $statsQuery = "SELECT 
                 (SELECT COUNT(*) FROM rooms) as total_rooms,
@@ -457,6 +476,51 @@ $show_add_form = isset($_GET['show_add']) ? true : false;
     </div>
     
     <!-- =============================================
+    MANAJEMEN CLIENT
+    ============================================= -->
+    <div class="section-box" id="section-client">
+        <h2>Manajemen Client</h2>
+        
+        <?php if(numRows($clients) > 0): ?>
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>No</th>
+                            <th>Nama</th>
+                            <th>Email</th>
+                            <th>Tanggal Daftar</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php 
+                        $no = 1;
+                        while($client = fetchOne($clients)): 
+                        ?>
+                        <tr>
+                            <td><?= $no++ ?></td>
+                            <td><strong><?= htmlspecialchars($client['nama']) ?></strong></td>
+                            <td><?= htmlspecialchars($client['email']) ?></td>
+                            <td><?= date('d/m/Y H:i', strtotime($client['created_at'])) ?></td>
+                            <td>
+                                <a href="?delete_client=1&id=<?= $client['id'] ?>#section-client" 
+                                   class="btn btn-danger btn-sm" 
+                                   onclick="return confirmDelete('Yakin ingin menghapus client ini? Semua reservasi client ini akan terhapus.')">
+                                    Hapus
+                                </a>
+                            </td>
+                        </tr>
+                        <?php endwhile; ?>
+                    </tbody>
+                </table>
+            </div>
+        <?php else: ?>
+            <p style="text-align: center; padding: 20px; color: #666;">Belum ada client yang terdaftar.</p>
+        <?php endif; ?>
+    </div>
+    
+    <!-- =============================================
     DAFTAR RESERVASI (DENGAN ANCHOR ID)
     ============================================= -->
     <div class="section-box" id="section-reservasi">
@@ -503,7 +567,6 @@ $show_add_form = isset($_GET['show_add']) ? true : false;
                             </td>
                             <td>
                                 <div style="display: flex; gap: 5px; flex-wrap: wrap;">
-                                    <!-- Tambahkan #section-reservasi di setiap link -->
                                     <a href="?detail=1&id=<?= $res['id'] ?>#section-reservasi" class="btn btn-info btn-sm">Detail</a>
                                     
                                     <?php if($res['status'] == 'booked'): ?>
