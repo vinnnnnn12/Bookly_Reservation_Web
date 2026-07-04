@@ -46,11 +46,10 @@ while($res = fetchOne($reservasiResult)) {
     <h1>Daftar Ruangan Rapat</h1>
     <p style="color: #666; margin-bottom: 20px;">
         <?php if(isset($_SESSION['nama'])): ?>
-            Selamat datang, <strong><?= $_SESSION['nama'] ?></strong>! 
             <?php if($_SESSION['role'] == 'admin'): ?>
-                (Admin)
+                Selamat datang, <strong>Admin</strong>!
             <?php else: ?>
-                (Client)
+                Selamat datang, <strong><?= $_SESSION['nama'] ?></strong>!
             <?php endif; ?>
         <?php else: ?>
             Silakan <a href="login.php">login</a> untuk melakukan reservasi.
@@ -72,17 +71,11 @@ while($res = fetchOne($reservasiResult)) {
             $reservasiList = isset($reservasiGroup[$roomId]) ? $reservasiGroup[$roomId] : [];
             $isBooked = !empty($reservasiList);
             
-            // =============================================
-            // CEK GAMBAR - Support URL dan File Lokal
-            // =============================================
+            // Cek gambar
             $gambarPath = $room['gambar'];
-            
-            // Cek apakah ini URL (mulai dengan http atau https)
             if (filter_var($gambarPath, FILTER_VALIDATE_URL)) {
-                // Ini adalah URL, langsung pakai
                 $gambarUrl = $gambarPath;
             } else {
-                // Ini adalah file lokal, cek keberadaan file
                 $gambarPath = 'uploads/' . $room['gambar'];
                 if (!file_exists($gambarPath)) {
                     $gambarPath = 'uploads/default.jpg';
@@ -155,7 +148,6 @@ function filterLantai(lantai) {
     var cards = document.querySelectorAll('.card');
     var buttons = document.querySelectorAll('.filter button');
     
-    // Update active button
     buttons.forEach(function(btn) {
         btn.classList.remove('active');
         if (parseInt(btn.getAttribute('data-lantai')) === lantai) {
@@ -163,7 +155,6 @@ function filterLantai(lantai) {
         }
     });
     
-    // Filter cards
     cards.forEach(function(card) {
         var cardLantai = parseInt(card.getAttribute('data-lantai'));
         if (lantai === 0 || cardLantai === lantai) {
@@ -174,7 +165,6 @@ function filterLantai(lantai) {
     });
 }
 
-// Fungsi validasi reservasi
 function validateReservasi(form) {
     var tanggal = form.tanggal.value;
     var jamMulai = form.jam_mulai.value;
@@ -208,12 +198,10 @@ function validateReservasi(form) {
     return true;
 }
 
-// Fungsi konfirmasi hapus
 function confirmDelete(message) {
     return confirm(message || 'Apakah Anda yakin ingin menghapus data ini?');
 }
 
-// Auto hide alert setelah 5 detik
 document.addEventListener('DOMContentLoaded', function() {
     var alerts = document.querySelectorAll('.alert');
     alerts.forEach(function(alert) {

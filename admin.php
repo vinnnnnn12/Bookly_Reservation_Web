@@ -277,7 +277,7 @@ $show_add_form = isset($_GET['show_add']) ? true : false;
 <div class="container">
     <h1>Dashboard Admin</h1>
     <p style="color: #666; margin-bottom: 20px;">
-        Selamat datang, <strong><?= $_SESSION['nama'] ?></strong>!
+        Selamat datang, <strong>Admin</strong>!
     </p>
     
     <div class="stats-grid">
